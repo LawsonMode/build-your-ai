@@ -1,0 +1,20 @@
+{
+  "name": "build-your-ai",
+  "version": "0.1.0",
+  "description": "A beginner-friendly, GitHub Pages-hosted AI personality & interaction builder. Answer plain-language questions and get a portable AI Interaction Profile for ChatGPT, Claude, Gemini, or Copilot.",
+  "keywords": [
+    "ai",
+    "chatgpt",
+    "claude",
+    "prompt",
+    "personality",
+    "custom-instructions",
+    "github-pages"
+  ],
+  "homepage": "https://angrymunky.github.io/build-your-ai/",
+  "license": "MIT",
+  "private": false,
+  "scripts": {
+    "start": "python -m http.server 8080"
+  }
+}
