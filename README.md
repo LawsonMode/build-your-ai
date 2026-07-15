@@ -24,7 +24,7 @@ Six quick steps:
 2. **Traits** — nudge six sliders (supportive↔challenging, casual↔professional, concise↔detailed, gentle↔blunt, reactive↔proactive, serious↔playful).
 3. **Behaviors** — toggle working habits and the task modes it should understand.
 4. **Memory & privacy** — set what it may remember, what to ask about first, and what to never store.
-5. **Preview** — see the finished profile and fine-tune it with one-click nudges.
+5. **Preview** — see a live sample reply that recomposes from your settings (no API calls), plus the finished profile, and fine-tune with one-click nudges.
 6. **Export** — copy the version for your platform, or download the full Markdown profile.
 
 The slider positions become *written instructions*, not numbers — you get
@@ -73,7 +73,6 @@ your browser's site data erases your saved profile.
 
 ## Roadmap
 
-- Live sample-response preview (canned, still no API calls).
 - More archetypes and example profiles.
 - Import/export of a saved configuration file.
 - Gemini Gems and Copilot-specific export formats.

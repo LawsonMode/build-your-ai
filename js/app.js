@@ -11,6 +11,7 @@
   var state = null;   // current wizard state
   var step = 0;       // current step index
   var toastTimer = null;
+  var previewScenario = 0; // which sample prompt the Preview step is showing
 
   // --- helpers -----------------------------------------------------------
 
@@ -19,6 +20,7 @@
     var node = document.createElement(tag);
     if (attrs) {
       Object.keys(attrs).forEach(function (k) {
+        if (attrs[k] == null) return; // skip null/undefined so we don't set e.g. disabled="null"
         if (k === "class") node.className = attrs[k];
         else if (k === "html") node.innerHTML = attrs[k];
         else if (k === "text") node.textContent = attrs[k];
@@ -267,8 +269,44 @@
     ]);
     body.appendChild(chips);
 
+    // Live sample-response panel — recomposes from current settings (no API).
+    body.appendChild(renderSamplePanel());
+
+    body.appendChild(el("h3", { class: "sub-head", text: "Your full profile" }));
     var out = BYAI.generate(state);
     body.appendChild(el("pre", { class: "profile-preview", text: out.markdown }));
+  }
+
+  function renderSamplePanel() {
+    var panel = el("div", { class: "sample-panel" });
+    panel.appendChild(el("h3", { class: "sub-head", text: "See it in action" }));
+
+    var tabs = el("div", { class: "tab-row" });
+    BYAI.sampleScenarios.forEach(function (sc, i) {
+      tabs.appendChild(el("button", {
+        class: "tab" + (i === previewScenario ? " active" : ""),
+        type: "button",
+        onclick: function () { previewScenario = i; renderStep(); },
+        text: sc.label
+      }));
+    });
+    panel.appendChild(tabs);
+
+    var sc = BYAI.sampleScenarios[previewScenario];
+    var chat = el("div", { class: "chat" }, [
+      el("div", { class: "bubble user" }, [
+        el("div", { class: "bubble-who", text: "You" }),
+        el("div", { text: sc.userPrompt })
+      ]),
+      el("div", { class: "bubble ai" }, [
+        el("div", { class: "bubble-who", text: "Your AI" }),
+        el("div", { class: "bubble-body", text: BYAI.sampleResponse(state, sc) })
+      ])
+    ]);
+    panel.appendChild(chat);
+    panel.appendChild(el("p", { class: "sample-note",
+      text: "Sample only — assembled from your settings to show the feel, not a real AI reply. Nudge the dials above and watch it change." }));
+    return panel;
   }
 
   function renderExportStep(body) {

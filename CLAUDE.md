@@ -1,4 +1,4 @@
-# Claude Context — Build Your AI (v0.2.0)
+# Claude Context — Build Your AI (v0.3.0)
 
 A beginner-friendly, GitHub Pages-hosted **AI personality & interaction builder**.
 Users answer plain-language questions (pick an archetype, nudge some trait
@@ -20,6 +20,7 @@ rule. Bump it on every versioned change (fix→PATCH, feature→MINOR, breaking�
 - `js/questions.js` — trait sliders, behavior rules, task modes, memory options + slider→language mapping.
 - `js/profiles.js` — archetype definitions and their preset answers.
 - `js/generator.js` — turns wizard state into the profile + platform-specific outputs.
+- `js/preview.js` — composes the live "See it in action" sample reply from settings (no API).
 - `js/app.js` — wizard flow, state, localStorage, rendering, export/copy.
 - `templates/` — reference Markdown skeletons for each platform output.
 - `docs/` — beginner guide, privacy & memory, personality recipes, testing your AI.
