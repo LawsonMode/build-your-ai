@@ -1,6 +1,6 @@
 {
   "name": "build-your-ai",
-  "version": "0.6.1",
+  "version": "0.6.2",
   "description": "A beginner-friendly, GitHub Pages-hosted AI personality & interaction builder. Answer plain-language questions and get a portable AI Interaction Profile for ChatGPT, Claude, Gemini, or Copilot.",
   "keywords": [
     "ai",

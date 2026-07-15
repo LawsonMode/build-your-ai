@@ -92,6 +92,10 @@ your browser's site data erases your saved profile.
 - More archetypes and example profiles.
 - Import/export of a saved configuration file.
 
+## Changelog
+
+See [CHANGELOG.md](CHANGELOG.md) for the release history.
+
 ## License
 
 MIT — see [LICENSE](LICENSE).
