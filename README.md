@@ -51,10 +51,19 @@ build-your-ai/
 │   ├── generator.js      # state → profile + platform outputs (pure functions)
 │   └── app.js            # wizard flow, state, localStorage, export
 ├── docs/                 # beginner guide and reference docs
+├── examples/             # ready-made example profiles (secretary, companion, ...)
 ├── package.json          # canonical version
 ├── README.md
 └── LICENSE
 ```
+
+## Example profiles
+
+Not sure where to start? The [`examples/`](examples/) folder has finished
+profiles for each archetype — the exact output the builder produces — ready to
+copy and paste: [secretary](examples/secretary.md), [companion](examples/companion.md),
+[coach](examples/coach.md), [devil's advocate](examples/devils-advocate.md),
+[creative partner](examples/creative-partner.md).
 
 ## Privacy
 
