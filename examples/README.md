@@ -4,8 +4,9 @@ These are finished **AI Interaction Profiles** — exactly what the builder prod
 when you pick each archetype and leave the defaults. Use them as ready-made
 starting points or as "here's what good looks like" references.
 
-Paste any of these into ChatGPT (Custom Instructions), Claude (Profile or Project
-instructions), Gemini, Copilot, or a generic system-prompt box.
+These are the portable Markdown version, which works in any AI. For the
+Claude-tailored versions (all chats, a Project, a task-mode Skill, CLAUDE.md),
+pick the same archetype in the builder and open the Export step.
 
 | File | Archetype | Best for |
 |---|---|---|

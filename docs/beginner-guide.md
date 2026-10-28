@@ -38,6 +38,13 @@ there. "Build My Own" starts everything in the middle.
 | The Creator | A creative partner to riff and build with. |
 | The Expert Assistant | Fast, confident, to-the-point answers. |
 
+## About you (optional)
+
+Step 2 asks what to call you, what you do, what you'll mostly use the AI for, and
+how much background you want. A line or two here saves the AI from guessing and
+helps it pitch answers at the right level. Skip anything you'd rather not share,
+and never put passwords or other people's details here.
+
 ## The sliders: words, not numbers
 
 Each slider becomes a written instruction in your profile — never a number. Slide
@@ -75,8 +82,14 @@ it'll feel like it was built for you — because it was.
 
 ## Where to paste your profile
 
-- **ChatGPT** — Settings → Personalization → Custom Instructions (two boxes).
-- **Claude** — Settings → Profile, or a Project's custom instructions.
-- **Gemini** — Saved info / Gems.
-- **Copilot** — the system/instructions field.
-- **Anything else** — use the generic system prompt or the full Markdown profile.
+The Export step tells you where each version goes. In short:
+
+- **Claude**: Settings → Your Claude → Instructions for every chat, or a
+  Project's instructions for one area of your life. There's also an optional
+  Skill for your task modes and a `CLAUDE.md` for Claude Code. See
+  [Setting up Claude](claude-guide.md).
+- **ChatGPT**: Settings → Personalization → Custom instructions (two boxes; the
+  builder splits it for you and counts characters).
+- **Gemini**: a Gem's instructions.
+- **Copilot**: paste it as the first message of a chat.
+- **Anything else**: use the "Any AI" system prompt or the full Markdown profile.

@@ -102,14 +102,22 @@
   // Optional task modes the user can invoke by name. Included in the profile as
   // a menu the AI understands.
   BYAI.taskModes = [
-    { key: "brainstorm", label: "Brainstorm", text: "Brainstorm Mode — generate lots of ideas without judging them yet." },
-    { key: "critic", label: "Critic", text: "Critic Mode — pressure-test an idea and find the weak points." },
-    { key: "teacher", label: "Teacher", text: "Teacher Mode — explain a topic step by step at my level." },
-    { key: "secretary", label: "Secretary", text: "Secretary Mode — organize, summarize, and track tasks and decisions." },
-    { key: "editor", label: "Editor", text: "Editor Mode — improve my writing while keeping my voice." },
-    { key: "research", label: "Research", text: "Research Mode — gather, compare, and lay out information with sources." },
-    { key: "planning", label: "Planning", text: "Planning Mode — break a goal into clear steps and a timeline." },
-    { key: "support", label: "Support", text: "Support Mode — talk something through with patience and empathy." }
+    { key: "brainstorm", label: "Brainstorm", text: "Brainstorm Mode — generate lots of ideas without judging them yet.",
+      detail: ["Give many varied ideas fast, including a few unusual ones.", "Hold off on critique until I ask for it.", "Build on my ideas instead of replacing them."] },
+    { key: "critic", label: "Critic", text: "Critic Mode — pressure-test an idea and find the weak points.",
+      detail: ["Look for the weakest assumptions and the most likely ways this fails.", "Rank problems by how much they matter.", "For each serious problem, suggest a fix or a stronger alternative."] },
+    { key: "teacher", label: "Teacher", text: "Teacher Mode — explain a topic step by step at my level.",
+      detail: ["Start from what I already know and build up one step at a time.", "Use a concrete example or analogy for each new idea.", "Check my understanding with a quick question before moving on."] },
+    { key: "secretary", label: "Secretary", text: "Secretary Mode — organize, summarize, and track tasks and decisions.",
+      detail: ["Turn what I say into clear lists of tasks, decisions, and open questions.", "Keep a running summary I can copy.", "Point out anything without an owner or a deadline."] },
+    { key: "editor", label: "Editor", text: "Editor Mode — improve my writing while keeping my voice.",
+      detail: ["Fix clarity, flow, and errors without changing what I mean.", "Keep my word choices and tone unless they get in the way.", "Show what you changed and why, briefly."] },
+    { key: "research", label: "Research", text: "Research Mode — gather, compare, and lay out information with sources.",
+      detail: ["Separate what is well established from what is uncertain.", "Compare options side by side when there are several.", "Say where information comes from, and flag anything you can't confirm."] },
+    { key: "planning", label: "Planning", text: "Planning Mode — break a goal into clear steps and a timeline.",
+      detail: ["Start by pinning down what \"done\" looks like and by when.", "Break the work into a few big steps, then detail only the first.", "Call out risks and what to cut if time runs short."] },
+    { key: "support", label: "Support", text: "Support Mode — talk something through with patience and empathy.",
+      detail: ["Listen first; reflect back what you hear before offering advice.", "Ask before switching into problem-solving.", "Keep a calm, unhurried tone."] }
   ];
 
   // Memory & privacy boundaries. Three tiers, each a list of toggles with a
@@ -146,14 +154,50 @@
     }
   };
 
-  // Platform export targets shown on the Export step.
+  // Optional "About you" answers. Free text the user types, plus one choice for
+  // how much background they want. Everything here is optional and stays local.
+  BYAI.aboutFields = [
+    { key: "name", label: "What should it call you?", placeholder: "e.g. Sam" },
+    { key: "work", label: "What do you do?", placeholder: "e.g. High-school media teacher" },
+    { key: "uses", label: "What will you mostly use it for?", placeholder: "e.g. Lesson planning, feedback on writing, organizing my week" }
+  ];
+
+  BYAI.expertise = [
+    { key: "", label: "No preference", text: "" },
+    { key: "new", label: "I'm new to most of this", text: "Assume I'm new to the topic: define terms and explain from the ground up." },
+    { key: "some", label: "I know the basics", text: "Assume I know the basics; skip beginner definitions unless I ask." },
+    { key: "expert", label: "Treat me as an expert", text: "Treat me as an expert; skip the basics and get to the substance." }
+  ];
+
+  // Export targets, grouped. Claude comes first: it gets one target per place
+  // you can put instructions in Claude. `where` tells the user where to paste.
+  // Menu names drift; re-check them against the live apps (last checked
+  // 2026-10-28).
   BYAI.platforms = [
-    { key: "markdown", label: "Full Markdown profile" },
-    { key: "chatgpt", label: "ChatGPT custom instructions" },
-    { key: "claude", label: "Claude profile instructions" },
-    { key: "gemini", label: "Gemini Gem instructions" },
-    { key: "copilot", label: "Copilot conversation starter" },
-    { key: "generic", label: "Generic system prompt" },
-    { key: "summary", label: "Plain-language summary" }
+    { key: "claude", group: "claude", label: "Claude: all chats",
+      where: "In Claude, open Settings → Your Claude → Instructions and paste this in. (Older layout: Settings → Profile.) It applies to every chat." },
+    { key: "claudeProject", group: "claude", label: "Claude: a Project",
+      where: "In Claude, open a Project → Instructions (“Set project instructions”) and paste this in. It applies only to chats inside that Project, so you can keep a different setup per class, job, or hobby." },
+    { key: "claudeSkill", group: "claude", label: "Claude: task-mode Skill",
+      where: "Download the .zip, then in Claude open Customize → Skills and upload it. Claude then switches modes when you say e.g. “go into Critic Mode.” Optional — your modes are already in the other Claude versions too." },
+    { key: "claudeCode", group: "claude", label: "Claude Code: CLAUDE.md",
+      where: "For Claude Code. Save as CLAUDE.md in ~/.claude/ to use it in every project, or in a project folder for just that project." },
+    { key: "chatgpt", group: "other", label: "ChatGPT",
+      where: "In ChatGPT, open Settings → Personalization → Custom instructions. The first part goes in the box about you; the second in the box for how ChatGPT should respond. Each box holds about 1,500 characters." },
+    { key: "gemini", group: "other", label: "Gemini",
+      where: "In Gemini, create a Gem and paste this into its Instructions box." },
+    { key: "copilot", group: "other", label: "Copilot",
+      where: "Paste this as the first message of a Copilot chat (or into its instructions field if your version has one)." },
+    { key: "generic", group: "other", label: "Any AI (system prompt)",
+      where: "Works anywhere that accepts a system prompt or custom instructions, including the Claude API." },
+    { key: "markdown", group: "other", label: "Full profile (Markdown)",
+      where: "The complete profile in one readable file. Good for keeping a copy or sharing your setup." },
+    { key: "summary", group: "other", label: "Plain-language summary",
+      where: "A human-readable recap of what you chose. Not meant to be pasted into an AI." }
+  ];
+
+  BYAI.platformGroups = [
+    { key: "claude", label: "Claude" },
+    { key: "other", label: "Other AIs" }
   ];
 })(window.BYAI = window.BYAI || {});

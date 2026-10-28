@@ -11,8 +11,9 @@
 <p align="center"><strong><a href="https://lawsonmode.github.io/build-your-ai/">▶ Open the live builder → lawsonmode.github.io/build-your-ai</a></strong></p>
 
 A beginner-friendly, browser-based builder that turns plain-language choices into
-a portable **AI Interaction Profile** you can paste into ChatGPT, Claude, Gemini,
-Microsoft Copilot, or any generic system-prompt box.
+ready-to-paste instructions for your AI. **It's made for Claude**, with a version
+for each place Claude takes instructions, and it also exports for ChatGPT,
+Gemini, Microsoft Copilot, or any system-prompt box.
 
 No account. No server. No AI API calls. Everything happens in your browser, and
 your answers are saved only in your browser's local storage.
@@ -26,14 +27,26 @@ someone to adjust a car seat by handing them a socket wrench. Build Your AI walk
 complete newcomer through the questions that actually matter, then assembles the
 answer for them.
 
-Six quick steps:
+Seven quick steps:
 
-1. **Archetype** — pick a starting point (Organizer, Companion, Motivator, Challenger, Teacher, Creator, Expert Assistant, or Build My Own).
-2. **Traits** — nudge six sliders (supportive↔challenging, casual↔professional, concise↔detailed, gentle↔blunt, reactive↔proactive, serious↔playful).
-3. **Behaviors** — toggle working habits and the task modes it should understand.
-4. **Memory & privacy** — set what it may remember, what to ask about first, and what to never store.
-5. **Preview** — see a live sample reply that recomposes from your settings (no API calls), plus the finished profile, and fine-tune with one-click nudges.
-6. **Export** — copy the version for your platform, or download the full Markdown profile.
+1. **Start** — pick an archetype (Organizer, Companion, Motivator, Challenger, Teacher, Creator, Expert Assistant, or Build My Own).
+2. **About you** (optional) — what to call you, what you do, what you'll use it for, and how much background you want.
+3. **Traits** — nudge six sliders (supportive↔challenging, casual↔professional, concise↔detailed, gentle↔blunt, reactive↔proactive, serious↔playful).
+4. **Behaviors** — toggle working habits and the task modes it should understand.
+5. **Memory & privacy** — set what it may remember, what to ask about first, and what to never store.
+6. **Preview** — see a live sample reply that recomposes from your settings (no API calls), get a heads-up when two choices contradict each other, and fine-tune with one-click nudges.
+7. **Export** — Claude first, then other AIs. Each version says exactly where to paste it.
+
+### Exports
+
+| Claude | Other AIs |
+|---|---|
+| **All chats**: Settings → Your Claude → Instructions | **ChatGPT**: two boxes, with a character count for each |
+| **A Project**: per-project instructions, in tagged sections | **Gemini**: Gem instructions |
+| **Task-mode Skill**: a ready-to-upload `.zip` that teaches Claude your modes | **Copilot**: a chat starter |
+| **Claude Code**: a `CLAUDE.md` file | **Any AI**: a generic system prompt, the full Markdown profile, or a plain-language summary |
+
+See [Setting up Claude](docs/claude-guide.md) for which Claude version to use.
 
 The slider positions become *written instructions*, not numbers — you get
 "Be direct and blunt; don't cushion the message," never `bluntness: 80%`.
@@ -56,7 +69,9 @@ build-your-ai/
 ├── js/
 │   ├── questions.js      # sliders, behaviors, task modes, memory + slider→language map
 │   ├── profiles.js       # archetype presets
-│   ├── generator.js      # state → profile + platform outputs (pure functions)
+│   ├── generator.js      # state → Claude + other-AI outputs, conflict check (pure functions)
+│   ├── preview.js        # live sample reply, assembled from settings (no API)
+│   ├── zip.js            # tiny zip writer for the Claude Skill download
 │   └── app.js            # wizard flow, state, localStorage, export
 ├── docs/                 # beginner guide and reference docs
 ├── examples/             # ready-made example profiles (secretary, companion, ...)
@@ -68,6 +83,7 @@ build-your-ai/
 ## Docs
 
 Optional background reading (all in [`docs/`](docs/)):
+[setting up Claude](docs/claude-guide.md) ·
 [beginner's guide](docs/beginner-guide.md) ·
 [privacy & memory](docs/privacy-and-memory.md) ·
 [testing & refining](docs/testing-your-ai.md) ·
@@ -77,7 +93,7 @@ Optional background reading (all in [`docs/`](docs/)):
 
 Not sure where to start? The [`examples/`](examples/) folder has finished
 profiles for each archetype — the exact output the builder produces — ready to
-copy and paste: [secretary](examples/secretary.md), [companion](examples/companion.md),
+copy and paste into any AI: [secretary](examples/secretary.md), [companion](examples/companion.md),
 [coach](examples/coach.md), [devil's advocate](examples/devils-advocate.md),
 [creative partner](examples/creative-partner.md).
 
@@ -90,7 +106,7 @@ your browser's site data erases your saved profile.
 ## Roadmap
 
 - More archetypes and example profiles.
-- Import/export of a saved configuration file.
+- Import/export of a saved configuration file, or a share link.
 
 ## Changelog
 

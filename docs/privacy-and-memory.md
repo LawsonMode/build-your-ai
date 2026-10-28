@@ -62,8 +62,10 @@ data) should simply never be typed into a general assistant in the first place.
 
 - **ChatGPT** — has an explicit Memory feature you can view, edit, and clear in
   Settings. Your profile's rules guide what it saves there.
-- **Claude** — memory and personalization are account/project-scoped; the profile
-  instructions shape what it retains and references.
+- **Claude** — can remember across chats. Settings → Your Claude → Your memory →
+  Manage shows and edits what it has kept; you can turn memory from chats off,
+  or use an incognito chat for anything you want left out. More in
+  [Setting up Claude](claude-guide.md).
 - **Gemini** — "Saved info" holds persistent facts; your Gem instructions steer it.
 - **Copilot** — consumer versions retain less across sessions, so the "conversation
   starter" export re-establishes your preferences each chat.

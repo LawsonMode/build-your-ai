@@ -6,6 +6,39 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 (fix → PATCH, feature → MINOR, breaking → MAJOR).
 
+## [0.7.0] — 2026-10-28
+### Added
+- **Claude-first exports.** The Export step now leads with four Claude versions,
+  each with a note saying where to paste it: all chats (Settings → Your Claude →
+  Instructions), a Project (instructions in tagged sections), a task-mode
+  **Skill** downloaded as a ready-to-upload `.zip`, and `CLAUDE.md` for Claude
+  Code. ChatGPT, Gemini, Copilot, a generic system prompt, the Markdown profile,
+  and the summary are grouped under "Other AIs".
+- **About you** step (optional): what to call you, what you do, what you'll use
+  the AI for, and how much background you want. Feeds every export.
+- **Conflict check** on the Preview step: flags choices that produce opposing
+  instructions (e.g. "rigorous critic" with "deliver feedback gently").
+- ChatGPT export shows a character count for each box against its 1,500 limit,
+  with separate Copy buttons for each box.
+- Task modes carry a few working rules each, used by the Project and Skill exports.
+- `docs/claude-guide.md`: which Claude version to use and where it goes, plus
+  Claude's memory controls.
+- `js/zip.js`: a tiny dependency-free zip writer for the Skill download.
+
+### Changed
+- Every export is built from the same sections, so a choice never drops out of
+  one platform's version.
+- Memory rules give Claude a short reason for each tier, and list items are
+  separated by semicolons (some labels contain commas).
+- The page follows the system light/dark setting until you pick one, without a
+  flash of the wrong theme.
+- Example profiles regenerated with the new generator.
+
+### Fixed
+- Task modes were missing from the Claude, ChatGPT, Gemini, and Copilot exports.
+- Memory tiers were partly missing from the Gemini, Copilot, and generic exports.
+- Screen readers now hear each slider's written instruction instead of a number.
+
 ## [0.6.3] — 2026-07-15
 ### Changed
 - GitHub account renamed `AngryMunky` → `LawsonMode`. Updated all URLs (Pages site,

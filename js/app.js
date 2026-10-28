@@ -6,12 +6,13 @@
   "use strict";
 
   var STORE_KEY = "byai.state.v1";
-  var STEPS = ["Archetype", "Traits", "Behaviors", "Memory", "Preview", "Export"];
+  var STEPS = ["Start", "About you", "Traits", "Behaviors", "Memory", "Preview", "Export"];
 
   var state = null;   // current wizard state
   var step = 0;       // current step index
   var toastTimer = null;
   var previewScenario = 0; // which sample prompt the Preview step is showing
+  var exportKey = "claude"; // which export the Export step is showing
 
   // --- helpers -----------------------------------------------------------
 
@@ -36,6 +37,9 @@
     return node;
   }
   function clamp(n) { return Math.max(0, Math.min(4, n)); }
+  function byKey(list, key) {
+    return list.filter(function (x) { return x.key === key; })[0] || null;
+  }
 
   function defaultMemory() {
     var m = {};
@@ -48,6 +52,7 @@
   function freshState() {
     return {
       archetype: null,
+      about: { name: "", work: "", uses: "", expertise: "" },
       role: "",
       personality: "",
       sliders: { support: 2, formality: 2, length: 2, tone: 2, initiative: 2, humor: 2 },
@@ -66,6 +71,9 @@
       if (!raw) return null;
       var parsed = JSON.parse(raw);
       if (!parsed || !parsed.sliders) return null;
+      // Fill in anything added since this state was saved.
+      var fresh = freshState();
+      Object.keys(fresh).forEach(function (k) { if (parsed[k] == null) parsed[k] = fresh[k]; });
       return parsed;
     } catch (e) { return null; }
   }
@@ -109,7 +117,9 @@
     document.body.removeChild(ta);
   }
   function download(filename, text) {
-    var blob = new Blob([text], { type: "text/plain;charset=utf-8" });
+    downloadBlob(filename, new Blob([text], { type: "text/plain;charset=utf-8" }));
+  }
+  function downloadBlob(filename, blob) {
     var url = URL.createObjectURL(blob);
     var a = el("a", { href: url, download: filename });
     document.body.appendChild(a); a.click(); document.body.removeChild(a);
@@ -129,6 +139,7 @@
       var card = el("button", {
         class: "archetype-card" + (selected ? " selected" : ""),
         type: "button",
+        "aria-pressed": selected ? "true" : "false",
         onclick: function () {
           applyArchetype(a.key);
           renderStep(); // reflect selection
@@ -143,8 +154,35 @@
     body.appendChild(grid);
   }
 
+  function renderAboutStep(body) {
+    body.appendChild(el("h2", { text: "2. About you" }));
+    body.appendChild(el("p", { class: "step-hint", text: "Optional. A line or two about you saves the AI from guessing. Skip anything you'd rather not share." }));
+
+    BYAI.aboutFields.forEach(function (f) {
+      var id = "about-" + f.key;
+      var input = el("input", { type: "text", id: id, class: "text-field", value: state.about[f.key] || "", placeholder: f.placeholder });
+      input.addEventListener("input", function () { state.about[f.key] = input.value; save(); });
+      body.appendChild(el("div", { class: "field-block" }, [
+        el("label", { class: "field-label", for: id, text: f.label }), input
+      ]));
+    });
+
+    var select = el("select", { id: "about-expertise", class: "text-field" });
+    BYAI.expertise.forEach(function (opt) {
+      var o = el("option", { value: opt.key, text: opt.label });
+      if ((state.about.expertise || "") === opt.key) o.selected = true;
+      select.appendChild(o);
+    });
+    select.addEventListener("change", function () { state.about.expertise = select.value; save(); });
+    body.appendChild(el("div", { class: "field-block" }, [
+      el("label", { class: "field-label", for: "about-expertise", text: "How much background do you want?" }), select
+    ]));
+
+    body.appendChild(el("p", { class: "sample-note", text: "Leave out anything private (passwords, account numbers, other people's details). This only goes into the text you copy." }));
+  }
+
   function renderTraitsStep(body) {
-    body.appendChild(el("h2", { text: "2. Mix the personality" }));
+    body.appendChild(el("h2", { text: "3. Mix the personality" }));
     body.appendChild(el("p", { class: "step-hint", text: "Slide toward whichever end fits you. The middle means “adapt to the moment.”" }));
 
     BYAI.sliders.forEach(function (s) {
@@ -156,11 +194,12 @@
       ]);
       var input = el("input", {
         type: "range", min: "0", max: "4", step: "1", value: String(val),
-        class: "slider", "aria-label": s.left + " to " + s.right
+        class: "slider", "aria-label": s.left + " to " + s.right, "aria-valuetext": s.map[val]
       });
       input.addEventListener("input", function () {
         state.sliders[s.key] = parseInt(input.value, 10);
         $(".slider-caption", wrap).textContent = s.map[state.sliders[s.key]];
+        input.setAttribute("aria-valuetext", s.map[state.sliders[s.key]]);
         save();
       });
       var wrap = el("div", { class: "slider-block" }, [labelRow, input]);
@@ -202,7 +241,7 @@
   }
 
   function renderBehaviorsStep(body) {
-    body.appendChild(el("h2", { text: "3. How should it behave?" }));
+    body.appendChild(el("h2", { text: "4. How should it behave?" }));
     body.appendChild(el("p", { class: "step-hint", text: "Turn on the working habits you want. None are required." }));
 
     body.appendChild(el("h3", { class: "sub-head", text: "Behavior rules" }));
@@ -233,7 +272,7 @@
   }
 
   function renderMemoryStep(body) {
-    body.appendChild(el("h2", { text: "4. Memory & privacy" }));
+    body.appendChild(el("h2", { text: "5. Memory & privacy" }));
     body.appendChild(el("p", { class: "step-hint", text: "Defaults are privacy-forward. Loosen or tighten as you like — the “never store” tier is a good one to keep." }));
 
     [BYAI.memory.mayRemember, BYAI.memory.askFirst, BYAI.memory.never].forEach(function (g) {
@@ -254,8 +293,16 @@
   }
 
   function renderPreviewStep(body) {
-    body.appendChild(el("h2", { text: "5. Preview" }));
+    body.appendChild(el("h2", { text: "6. Preview" }));
     body.appendChild(el("p", { class: "step-hint", text: "Here's the profile you've built. Use the quick nudges to fine-tune, then head to Export." }));
+
+    var conflicts = BYAI.findConflicts(state);
+    if (conflicts.length) {
+      body.appendChild(el("div", { class: "notice", role: "note" }, [
+        el("strong", { text: "Heads up: some choices pull in opposite directions." }),
+        el("ul", null, conflicts.map(function (c) { return el("li", { text: c }); }))
+      ]));
+    }
 
     var s = state.sliders;
     var chips = el("div", { class: "chip-row" }, [
@@ -272,9 +319,9 @@
     // Live sample-response panel — recomposes from current settings (no API).
     body.appendChild(renderSamplePanel());
 
-    body.appendChild(el("h3", { class: "sub-head", text: "Your full profile" }));
+    body.appendChild(el("h3", { class: "sub-head", text: "Your Claude instructions" }));
     var out = BYAI.generate(state);
-    body.appendChild(el("pre", { class: "profile-preview", text: out.markdown }));
+    body.appendChild(el("pre", { class: "profile-preview", text: out.claude }));
   }
 
   function renderSamplePanel() {
@@ -309,59 +356,94 @@
     return panel;
   }
 
+  var DOWNLOAD_NAMES = {
+    claude: "claude-instructions.txt",
+    claudeProject: "claude-project-instructions.txt",
+    claudeCode: "CLAUDE.md",
+    chatgpt: "chatgpt-custom-instructions.txt",
+    gemini: "gemini-gem-instructions.txt",
+    copilot: "copilot-starter.txt",
+    generic: "system-prompt.txt",
+    markdown: "ai-interaction-profile.md",
+    summary: "ai-profile-summary.txt"
+  };
+
   function renderExportStep(body) {
-    body.appendChild(el("h2", { text: "6. Export" }));
-    body.appendChild(el("p", { class: "step-hint", text: "Copy the version that fits where you'll use it, or download the full Markdown profile." }));
+    body.appendChild(el("h2", { text: "7. Export" }));
+    body.appendChild(el("p", { class: "step-hint", text: "Built for Claude first. Pick where you'll use it and copy — or grab a version for another AI." }));
 
     var out = BYAI.generate(state);
+    var platform = byKey(BYAI.platforms, exportKey) || BYAI.platforms[0];
+    var key = platform.key;
 
-    // tabs
-    var tabRow = el("div", { class: "tab-row" });
-    var pane = el("pre", { class: "profile-preview" });
-    var current = "markdown";
-
-    function contentFor(key) {
-      if (key === "chatgpt") {
-        return "— What ChatGPT should know about me —\n" + out.chatgpt.about +
-          "\n\n— How ChatGPT should respond —\n" + out.chatgpt.how;
+    function contentFor(k) {
+      if (k === "chatgpt") {
+        return "— Box 1: What ChatGPT should know about you —\n" + out.chatgpt.about +
+          "\n\n— Box 2: How ChatGPT should respond —\n" + out.chatgpt.how;
       }
-      return out[key];
+      if (k === "claudeSkill" && !out.claudeSkill) {
+        return "No task modes chosen yet. Pick some on step 4 (Behaviors) to build a Skill.";
+      }
+      return out[k];
     }
-    function selectTab(key) {
-      current = key;
-      pane.textContent = contentFor(key);
-      Array.prototype.forEach.call(tabRow.children, function (btn) {
-        btn.classList.toggle("active", btn.getAttribute("data-key") === key);
+
+    BYAI.platformGroups.forEach(function (g) {
+      body.appendChild(el("div", { class: "tab-group-label", text: g.label }));
+      var row = el("div", { class: "tab-row" });
+      BYAI.platforms.filter(function (p) { return p.group === g.key; }).forEach(function (p) {
+        row.appendChild(el("button", {
+          class: "tab" + (p.key === key ? " active" : ""), type: "button",
+          "aria-pressed": p.key === key ? "true" : "false",
+          onclick: function () { exportKey = p.key; renderStep(); }, text: p.label
+        }));
+      });
+      body.appendChild(row);
+    });
+
+    body.appendChild(el("p", { class: "where-hint", text: platform.where }));
+
+    if (key === "chatgpt") {
+      var limit = BYAI.chatgptLimit;
+      [["Box 1", out.chatgpt.about], ["Box 2", out.chatgpt.how]].forEach(function (b) {
+        var over = b[1].length > limit;
+        body.appendChild(el("p", { class: "char-count" + (over ? " over" : ""),
+          text: b[0] + ": " + b[1].length.toLocaleString() + " / " + limit.toLocaleString() + " characters" +
+            (over ? " — too long; turn off a few choices." : "") }));
       });
     }
 
-    BYAI.platforms.forEach(function (p) {
-      tabRow.appendChild(el("button", {
-        class: "tab", type: "button", "data-key": p.key,
-        onclick: function () { selectTab(p.key); }, text: p.label
-      }));
-    });
+    body.appendChild(el("pre", { class: "profile-preview", text: contentFor(key) }));
 
-    body.appendChild(tabRow);
-    body.appendChild(pane);
-
-    var actions = el("div", { class: "action-row" }, [
-      el("button", { class: "btn primary", type: "button", text: "Copy this version",
-        onclick: function () { copyText(contentFor(current)); } }),
-      el("button", { class: "btn", type: "button", text: "Download Markdown profile",
-        onclick: function () { download("ai-interaction-profile.md", out.markdown); } }),
-      el("button", { class: "btn", type: "button", text: "Download plain text",
-        onclick: function () { download("ai-interaction-profile.txt", out.summary + "\n\n" + out.generic); } }),
-      el("button", { class: "btn ghost", type: "button", text: "Start over",
+    var actions = [];
+    if (key === "claudeSkill") {
+      actions.push(el("button", { class: "btn primary", type: "button", text: "Download Skill (.zip)",
+        disabled: out.claudeSkill ? null : "disabled",
         onclick: function () {
-          if (confirm("Clear everything and start a new profile?")) {
-            state = freshState(); step = 0; save(); renderStep();
-          }
-        } })
-    ]);
-    body.appendChild(actions);
-
-    selectTab("markdown");
+          downloadBlob(BYAI.skillName + ".zip", BYAI.makeZip([{ path: BYAI.skillName + "/SKILL.md", text: out.claudeSkill }]));
+        } }));
+      actions.push(el("button", { class: "btn", type: "button", text: "Copy SKILL.md",
+        disabled: out.claudeSkill ? null : "disabled",
+        onclick: function () { copyText(out.claudeSkill); } }));
+    } else if (key === "chatgpt") {
+      actions.push(el("button", { class: "btn primary", type: "button", text: "Copy box 1",
+        onclick: function () { copyText(out.chatgpt.about); } }));
+      actions.push(el("button", { class: "btn primary", type: "button", text: "Copy box 2",
+        onclick: function () { copyText(out.chatgpt.how); } }));
+    } else {
+      actions.push(el("button", { class: "btn primary", type: "button", text: "Copy",
+        onclick: function () { copyText(contentFor(key)); } }));
+    }
+    if (DOWNLOAD_NAMES[key]) {
+      actions.push(el("button", { class: "btn", type: "button", text: "Download " + DOWNLOAD_NAMES[key],
+        onclick: function () { download(DOWNLOAD_NAMES[key], contentFor(key)); } }));
+    }
+    actions.push(el("button", { class: "btn ghost", type: "button", text: "Start over",
+      onclick: function () {
+        if (confirm("Clear everything and start a new profile?")) {
+          state = freshState(); step = 0; exportKey = "claude"; save(); renderStep();
+        }
+      } }));
+    body.appendChild(el("div", { class: "action-row" }, actions));
   }
 
   // --- shell -------------------------------------------------------------
@@ -393,7 +475,6 @@
     } else {
       next.style.visibility = "visible";
       next.disabled = !state.archetype;
-      next.textContent = step === 0 ? "Next →" : "Next →";
     }
   }
 
@@ -403,22 +484,22 @@
     body.innerHTML = "";
     switch (step) {
       case 0: renderArchetypeStep(body); break;
-      case 1: renderTraitsStep(body); break;
-      case 2: renderBehaviorsStep(body); break;
-      case 3: renderMemoryStep(body); break;
-      case 4: renderPreviewStep(body); break;
-      case 5: renderExportStep(body); break;
+      case 1: renderAboutStep(body); break;
+      case 2: renderTraitsStep(body); break;
+      case 3: renderBehaviorsStep(body); break;
+      case 4: renderMemoryStep(body); break;
+      case 5: renderPreviewStep(body); break;
+      case 6: renderExportStep(body); break;
     }
     renderNav();
     body.scrollTop = 0;
     window.scrollTo(0, 0);
   }
 
+  // The starting theme (saved choice, else the system setting) is applied by a
+  // small inline script in index.html's <head> so the page doesn't flash.
   function initTheme() {
     var toggle = $("#theme-toggle");
-    var saved = null;
-    try { saved = localStorage.getItem("byai.theme"); } catch (e) {}
-    if (saved) document.documentElement.setAttribute("data-theme", saved);
     toggle.addEventListener("click", function () {
       var cur = document.documentElement.getAttribute("data-theme");
       var nextTheme = cur === "dark" ? "light" : "dark";

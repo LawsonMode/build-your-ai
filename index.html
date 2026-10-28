@@ -1,10 +1,20 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Build Your AI — design how your assistant works with you</title>
-  <meta name="description" content="A beginner-friendly builder that turns plain-language choices into a portable AI Interaction Profile for ChatGPT, Claude, Gemini, or Copilot." />
+  <meta name="description" content="A beginner-friendly builder that turns plain-language choices into ready-to-paste instructions for Claude, and for ChatGPT, Gemini, Copilot, or any AI." />
+
+  <!-- set the theme before first paint: saved choice, else the system setting -->
+  <script>
+    (function () {
+      var t = null;
+      try { t = localStorage.getItem("byai.theme"); } catch (e) {}
+      if (!t) t = window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      document.documentElement.setAttribute("data-theme", t);
+    })();
+  </script>
 
   <!-- favicons -->
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
@@ -15,7 +25,7 @@
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="Build Your AI" />
   <meta property="og:title" content="Build Your AI" />
-  <meta property="og:description" content="Don't just use an AI. Decide how you want it to work with you — a beginner-friendly builder that makes portable profiles for ChatGPT, Claude, Gemini & Copilot." />
+  <meta property="og:description" content="Don't just use an AI. Decide how you want it to work with you — a beginner-friendly builder made for Claude that also works with ChatGPT, Gemini, Copilot & any AI." />
   <meta property="og:url" content="https://lawsonmode.github.io/build-your-ai/" />
   <meta property="og:image" content="https://lawsonmode.github.io/build-your-ai/assets/og-image.png" />
   <meta property="og:image:width" content="1200" />
@@ -23,7 +33,7 @@
   <meta property="og:image:alt" content="Build Your AI — don't just use an AI, decide how it works with you." />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Build Your AI" />
-  <meta name="twitter:description" content="Decide how you want your AI to work with you. A beginner-friendly builder for ChatGPT, Claude, Gemini & Copilot." />
+  <meta name="twitter:description" content="Decide how you want your AI to work with you. A beginner-friendly builder made for Claude, and for ChatGPT, Gemini, Copilot & any AI." />
   <meta name="twitter:image" content="https://lawsonmode.github.io/build-your-ai/assets/og-image.png" />
 
   <link rel="stylesheet" href="css/styles.css" />
@@ -43,7 +53,7 @@
   <main class="wrap">
     <section class="intro">
       <h1>Don't just <em>use</em> an AI. Decide how you want it to work with you.</h1>
-      <p>Answer a few plain-language questions and get a ready-to-paste profile for ChatGPT, Claude, Gemini, or Copilot. Everything stays in your browser — no account, no server.</p>
+      <p>Answer a few plain-language questions and get ready-to-paste instructions made for Claude — plus versions for ChatGPT, Gemini, Copilot, or any AI. Everything stays in your browser — no account, no server.</p>
     </section>
 
     <nav id="stepper" class="stepper" aria-label="Builder steps"></nav>
@@ -66,6 +76,7 @@
   <script src="js/profiles.js"></script>
   <script src="js/generator.js"></script>
   <script src="js/preview.js"></script>
+  <script src="js/zip.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>
