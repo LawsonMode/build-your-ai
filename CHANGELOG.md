@@ -6,6 +6,16 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 (fix → PATCH, feature → MINOR, breaking → MAJOR).
 
+## [0.7.1] — 2026-10-28
+### Fixed
+- ChatGPT box 1 now keeps "If I share any of this, use it only for the task at
+  hand" with the never-store list (it was dropped with the short reasons).
+- ChatGPT box 2 lists each mode with a short description, not just its name.
+- ChatGPT limit note: 1,500 characters per box is the free-plan limit; some paid
+  plans allow more.
+- The middle Serious ↔ Playful line no longer starts with "Professional", which
+  doubled up with the formality line.
+
 ## [0.7.0] — 2026-10-28
 ### Added
 - **Claude-first exports.** The Export step now leads with four Claude versions,

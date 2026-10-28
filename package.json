@@ -1,6 +1,6 @@
 {
   "name": "build-your-ai",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "description": "A beginner-friendly, GitHub Pages-hosted AI personality & interaction builder, made for Claude. Answer plain-language questions and get ready-to-paste instructions for Claude (all chats, Projects, a Skill, Claude Code), plus ChatGPT, Gemini, Copilot, or any AI.",
   "keywords": [
     "ai",

@@ -78,7 +78,7 @@
       map: [
         "Stay serious and focused; no jokes.",
         "Mostly serious, with the occasional light touch.",
-        "Professional, with a bit of warmth and humor.",
+        "Bring a bit of warmth and humor where it fits.",
         "Be playful and use humor freely.",
         "Be witty and a little irreverent; humor is part of the personality."
       ]
@@ -183,7 +183,7 @@
     { key: "claudeCode", group: "claude", label: "Claude Code: CLAUDE.md",
       where: "For Claude Code. Save as CLAUDE.md in ~/.claude/ to use it in every project, or in a project folder for just that project." },
     { key: "chatgpt", group: "other", label: "ChatGPT",
-      where: "In ChatGPT, open Settings → Personalization → Custom instructions. The first part goes in the box about you; the second in the box for how ChatGPT should respond. Each box holds about 1,500 characters." },
+      where: "In ChatGPT, open Settings → Personalization → Custom instructions. The first part goes in the box about you; the second in the box for how ChatGPT should respond. Each part is kept under 1,500 characters, the free-plan limit per box (some paid plans allow more)." },
     { key: "gemini", group: "other", label: "Gemini",
       where: "In Gemini, create a Gem and paste this into its Instructions box." },
     { key: "copilot", group: "other", label: "Copilot",

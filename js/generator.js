@@ -85,14 +85,16 @@
 
   // Memory rules as instruction lines. Claude follows instructions better when
   // it knows the reason, so each tier carries a short "why" unless `brief`.
-  // Items are joined with semicolons because some labels contain commas.
+  // The never-store tier always keeps its "use it only for the task" rule: that
+  // is an instruction, not a reason. Items are joined with semicolons because
+  // some labels contain commas.
   function memoryRuleLines(state, brief) {
     var mem = memoryLists(state);
     var lines = [];
     function why(text) { return brief ? "" : " " + text; }
     if (mem.may.length) lines.push("You may remember: " + mem.may.join("; ") + "." + why("These help you work with me without me repeating myself."));
     if (mem.ask.length) lines.push("Ask me before remembering: " + mem.ask.join("; ") + "." + why("I want to decide which personal details you keep."));
-    if (mem.never.length) lines.push("Never store: " + mem.never.join("; ") + "." + why("If I share any of this, use it only for the task at hand."));
+    if (mem.never.length) lines.push("Never store: " + mem.never.join("; ") + ". If I share any of this, use it only for the task at hand.");
     lines.push("Don't repeat sensitive information back unless I bring it up first.");
     return lines;
   }
@@ -253,7 +255,11 @@
     var about = sec.about.concat(memoryRuleLines(state, true));
     var how = ["Act as my " + sec.roleLower + ". " + sec.personality]
       .concat(howLines(sec));
-    if (sec.modes.length) how.push(MODE_INTRO.replace(/:$/, ": ") + sec.modes.map(function (m) { return m.label + " Mode"; }).join(", ") + ".");
+    if (sec.modes.length) {
+      how.push(MODE_INTRO.replace(/:$/, ": ") + sec.modes.map(function (m) {
+        return m.label + " Mode (" + m.text.replace(/^[^—]*—\s*/, "").replace(/\.$/, "") + ")";
+      }).join("; ") + ".");
+    }
     return {
       about: about.join(" "),
       how: bullets(how)
